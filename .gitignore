@@ -1,0 +1,30 @@
+
+This file tells Git **what NOT to save** — like your virtual environment (it's huge and unnecessary to upload).
+
+In VS Code, click on `.gitignore` to open it. Then type exactly this:
+```
+# Virtual Environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables (keep secrets safe)
+.env
+
+# VS Code settings
+.vscode/
+
+# ML model files (too large for git)
+detection/models/*.pkl
+detection/models/*.h5
+detection/models/*.pt
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
