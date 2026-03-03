@@ -62,3 +62,81 @@ Cloud Systems → Telemetry → ML Detection → AI Agent → GenAI Report → D
 ✅ Phase 6 — GenAI Incident Reports
 ✅ Phase 7 — FastAPI Backend
 ✅ Phase 8 — Documentation
+
+
+## 🏗️ System Architecture
+┌─────────────────────────────────────────────────────────────────┐
+│                    SIMULATED MICROSERVICES                      |
+│  api-gateway → auth-service → user-service                      │
+│  api-gateway → order-service → payment-service ← ROOT CAUSE     │
+│                             → inventory-service                 |
+│               payment-service → notification-service            |
+└────────────────────────────┬────────────────────────────────────┘
+                             │ logs + metrics + traces
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  TELEMETRY INGESTION (Kafka)                    |
+│                                                                 │
+│   telemetry.logs   telemetry.metrics   telemetry.traces         │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│               ML ANOMALY DETECTION ENGINE                       │
+│                                                                 │
+│   ┌─────────────────────┐   ┌─────────────────────────┐         │
+│   │  Isolation Forest   │   │   LSTM Autoencoder       │        │
+│   │  (metric spikes)    │   │   (time-series patterns) │        │
+│   └─────────────────────┘   └─────────────────────────┘         │
+│                    │                    │                       │
+│                    └────────┬───────────┘                       │
+│                             ▼                                   │
+│                   anomalies.detected (Kafka)                    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    RCA AGENT                                    │
+│                                                                 │
+│   Step 1: Group anomalies by service                            │
+│   Step 2: Find root cause (graph analysis)                      │
+│   Step 3: Calculate blast radius                                │
+│   Step 4: Search past incidents (RAG)                           │
+│   Step 5: Generate hypotheses + fixes                           │
+│                    │                                            │
+│                   rca.results (Kafka)                           │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              GENAI REPORT GENERATOR (Groq Llama 3)              │
+│                                                                 │
+│   Input:  Structured RCA data                                   │
+│   Output: Professional incident report                          │
+│   Saved:  /reports/*.txt + /reports/*_raw.json                  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   FASTAPI REST API                              │
+│                                                                 │
+│   GET /incidents          GET /anomalies/live                   │
+│   GET /incidents/{id}     GET /services/graph                   │
+│   GET /incidents/stats    GET /services/{name}/blast-radius     │
+│                                                                 │
+│   Swagger UI: http://localhost:8000/docs                        │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## 🔧 Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Ingestion** | Apache Kafka, OpenTelemetry | Real-time telemetry streaming |
+| **ML Detection** | LSTM Autoencoder, Isolation Forest | Anomaly detection |
+| **RCA Agent** | NetworkX, RAG | Root cause reasoning |
+| **GenAI** | Groq API (Llama 3) | Incident report generation |
+| **API** | FastAPI, Pydantic | REST endpoints |
+| **Storage** | PostgreSQL, Redis | Data persistence |
+| **Infra** | Docker Compose | Local infrastructure |
+| **Language** | Python 3.11 | Core implementation |
