@@ -13,6 +13,7 @@ if ROOT not in sys.path:
 
 from ingestion.models import AnomalyEvent
 from rca.agent.rca_agent import RCAAgent
+from rca.rag_retriever   import RAGRetriever
 
 TOPIC_ANOMALIES = "anomalies.detected"
 TOPIC_RCA       = "rca.results"
@@ -92,10 +93,18 @@ def run_rca_engine():
                 # Print full report
                 _print_report(report)
 
-                # Publish to Kafka
+                   # Publish to Kafka
                 producer.send(TOPIC_RCA, value=report)
                 producer.flush()
                 print(f"\n📤 RCA report published to {TOPIC_RCA}")
+
+                # ── AUTO-LEARN: Save incident to knowledge base ──
+                rag = RAGRetriever()
+                learned_id = rag.save_new_incident(report)
+                print(f"🧠 Incident {learned_id} saved to RAG knowledge base")
+                kb_stats = rag.get_stats()
+                print(f"   Knowledge base: {kb_stats['total']} total incidents "
+                      f"({kb_stats['learned_incidents']} learned)")
 
                 # Clear buffer for next window
                 anomaly_buffer = []
