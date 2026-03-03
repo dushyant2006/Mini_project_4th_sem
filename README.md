@@ -9240,3 +9240,72 @@ python data/simulate_telemetry.py --anomaly payment-service
 | **Swagger API Docs** | http://localhost:8000/docs |
 | **Kafka UI** | http://localhost:8080 |
 | **Incident Reports** | `/reports/` folder |
+
+## 📡 API Reference
+
+Base URL: `http://localhost:8000`
+
+### Incidents
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/incidents` | List all incidents |
+| GET | `/incidents/{id}` | Get incident by ID |
+| GET | `/incidents/recent` | Last 10 incidents |
+| GET | `/incidents/stats` | Incident statistics |
+
+### Anomalies
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/anomalies/live` | Live anomaly feed |
+| GET | `/anomalies/by-service/{name}` | Anomalies by service |
+| GET | `/anomalies/summary` | Anomaly statistics |
+
+### Services
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/services/graph` | Full dependency graph |
+| GET | `/services/list` | All services + metadata |
+| GET | `/services/{name}/blast-radius` | Failure impact analysis |
+| GET | `/services/{name}/dependencies` | Dependency chain |
+
+### Health
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | Welcome + endpoint list |
+| GET | `/health` | System health check |
+
+> 📖 Full interactive docs available at: http://localhost:8000/docs
+
+---
+
+## 🤖 ML Models
+
+### 1. Isolation Forest
+- **Type:** Unsupervised anomaly detection
+- **Input:** Last 20 metric readings per service
+- **Detects:** Sudden spikes in CPU, latency, error rate, memory
+- **Threshold:** Dynamic (hard threshold + statistical outlier)
+
+### 2. LSTM Autoencoder
+- **Type:** Deep learning sequence model
+- **Input:** Time-series windows of metric values
+- **Detects:** Abnormal patterns that don't match historical behavior
+- **Training:** Continuous online learning on live data
+
+---
+
+## 📁 Project Structure
+```
+project71/
+├── ingestion/          # Kafka producers, consumers, data models
+├── detection/          # ML anomaly detection (Isolation Forest + LSTM)
+├── rca/                # Root cause analysis agent + graph builder
+├── reporting/          # GenAI incident report generator
+├── api/                # FastAPI REST endpoints
+├── data/               # Telemetry simulator
+├── reports/            # Generated incident reports (auto-created)
+├── tests/              # Unit and integration tests
+├── docs/               # Additional documentation
+├── docker-compose.yml  # Infrastructure setup
+├── requirements.txt    # Python dependencies
+└── .env                # Configuration (not committed)
