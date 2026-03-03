@@ -1,11 +1,3 @@
-# ============================================================
-# detection/detection_engine.py
-# PURPOSE: Main detection loop — reads metrics from Kafka,
-#          feeds them to ML models, publishes anomalies
-#
-# HOW TO RUN:
-#   python detection/detection_engine.py
-# ============================================================
 
 import json
 import sys
@@ -20,12 +12,12 @@ if ROOT not in sys.path:
 from detection.data_buffer        import MetricBuffer
 from detection.isolation_forest   import IsolationForestDetector
 from detection.lstm_autoencoder   import LSTMDetector
+from detection.prophet_baseline   import ProphetDetector
 from detection.anomaly_publisher  import AnomalyPublisher
 
 TOPIC_METRICS   = "telemetry.metrics"
 TOPIC_ANOMALIES = "anomalies.detected"
 
-# Run ML analysis every N metric messages received
 ANALYZE_EVERY = 10
 
 
@@ -33,18 +25,19 @@ def run_detection_engine():
     print("=" * 60)
     print("  PROJECT 71 — ANOMALY DETECTION ENGINE")
     print("=" * 60)
-    print("  Models: Isolation Forest + LSTM Autoencoder")
+    print("  Models: Isolation Forest + LSTM + Prophet")
     print("  Input:  telemetry.metrics (Kafka)")
     print("  Output: anomalies.detected (Kafka)")
     print("=" * 60)
 
     # ── Initialize components ──────────────────────────────
-    buffer    = MetricBuffer(window_size=20)
-    iso_det   = IsolationForestDetector(buffer, contamination=0.1)
-    lstm_det  = LSTMDetector(buffer, seq_len=20)
-    publisher = AnomalyPublisher()
+    buffer      = MetricBuffer(window_size=20)
+    iso_det     = IsolationForestDetector(buffer, contamination=0.1)
+    lstm_det    = LSTMDetector(buffer, seq_len=20)
+    prophet_det = ProphetDetector(buffer, min_samples=20)
+    publisher   = AnomalyPublisher()
 
-    # ── Kafka Consumer (reads metrics) ─────────────────────
+    # ── Kafka Consumer ─────────────────────────────────────
     consumer = KafkaConsumer(
         TOPIC_METRICS,
         bootstrap_servers="localhost:9092",
@@ -58,7 +51,7 @@ def run_detection_engine():
     print("\n✅ Detection engine running... Press Ctrl+C to stop\n")
     print("-" * 60)
 
-    msg_count    = 0
+    msg_count     = 0
     anomaly_count = 0
 
     try:
@@ -75,13 +68,12 @@ def run_detection_engine():
                     service     = data.get("service", "")
                     metric_name = data.get("metric_name", "")
                     value       = data.get("value", 0.0)
-                    timestamp   = data.get("timestamp")
 
                     # Add to buffer
                     buffer.add(service, metric_name, value)
                     msg_count += 1
 
-                    # Print progress every 35 messages (one full batch)
+                    # Print progress every 35 messages
                     if msg_count % 35 == 0:
                         print(f"📥 Buffered {msg_count} metrics across "
                               f"{len(buffer.get_all_services())} services")
@@ -95,8 +87,15 @@ def run_detection_engine():
                         # Run LSTM
                         lstm_anomalies = lstm_det.analyze_all()
 
-                        # Combine results
-                        all_anomalies = iso_anomalies + lstm_anomalies
+                        # Run Prophet (every 50 msgs — slower model)
+                        prophet_anomalies = []
+                        if msg_count % 50 == 0:
+                            prophet_anomalies = prophet_det.analyze_all()
+
+                        # Combine all model results
+                        all_anomalies = (iso_anomalies +
+                                         lstm_anomalies +
+                                         prophet_anomalies)
 
                         if all_anomalies:
                             anomaly_count += len(all_anomalies)
