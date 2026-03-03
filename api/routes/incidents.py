@@ -1,27 +1,22 @@
+
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from datetime import datetime
 import json
 import os
 import glob
+import sys
 
 router = APIRouter()
 
-# Reports are saved as JSON files in /reports/ folder
 REPORTS_DIR = "reports"
 
 
 def load_all_incidents() -> List[dict]:
-    """
-    Loads all incident JSON files from /reports/ directory.
-    Returns them sorted by timestamp (newest first).
-    """
+    """Loads all incident JSON files from /reports/ directory"""
     incidents = []
-
-    # glob finds all files matching a pattern
-    # **/*_raw.json matches any _raw.json file in reports/
-    pattern = os.path.join(REPORTS_DIR, "*_raw.json")
-    files   = glob.glob(pattern)
+    pattern   = os.path.join(REPORTS_DIR, "*_raw.json")
+    files     = glob.glob(pattern)
 
     for filepath in files:
         try:
@@ -31,7 +26,6 @@ def load_all_incidents() -> List[dict]:
         except Exception as e:
             print(f"Error loading {filepath}: {e}")
 
-    # Sort by timestamp — newest first
     incidents.sort(
         key=lambda x: x.get("timestamp", ""),
         reverse=True
@@ -55,7 +49,7 @@ def load_report_text(incident_id: str) -> Optional[str]:
 
 @router.get("/", summary="List all incidents")
 async def list_incidents(
-    limit: int  = 20,
+    limit:    int          = 20,
     severity: Optional[int] = None,
     service:  Optional[str] = None,
 ):
@@ -69,7 +63,6 @@ async def list_incidents(
     """
     incidents = load_all_incidents()
 
-    # Apply filters
     if severity:
         incidents = [i for i in incidents
                      if i.get("severity") == severity]
@@ -77,7 +70,6 @@ async def list_incidents(
         incidents = [i for i in incidents
                      if i.get("root_cause_service") == service]
 
-    # Apply limit
     incidents = incidents[:limit]
 
     return {
@@ -104,30 +96,64 @@ async def incident_stats():
     if not incidents:
         return {"message": "No incidents recorded yet"}
 
-    # Count by severity
     sev_counts = {1: 0, 2: 0, 3: 0, 4: 0}
     for inc in incidents:
         sev = inc.get("severity", 4)
         sev_counts[sev] = sev_counts.get(sev, 0) + 1
 
-    # Count by service
     svc_counts = {}
     for inc in incidents:
         svc = inc.get("root_cause_service", "unknown")
         svc_counts[svc] = svc_counts.get(svc, 0) + 1
 
     return {
-        "total_incidents":   len(incidents),
+        "total_incidents": len(incidents),
         "by_severity": {
             "SEV-1 (Critical)": sev_counts[1],
             "SEV-2 (High)":     sev_counts[2],
             "SEV-3 (Medium)":   sev_counts[3],
             "SEV-4 (Low)":      sev_counts[4],
         },
-        "by_service":        svc_counts,
-        "most_affected":     max(svc_counts, key=svc_counts.get)
-                             if svc_counts else "none",
+        "by_service":  svc_counts,
+        "most_affected": max(svc_counts, key=svc_counts.get)
+                         if svc_counts else "none",
     }
+
+
+@router.get("/knowledge-base", summary="RAG knowledge base stats")
+async def knowledge_base_stats():
+    """
+    Returns statistics about the RAG incident knowledge base.
+    Shows how many incidents the system has learned from.
+    """
+    ROOT = os.path.dirname(os.path.dirname(
+           os.path.dirname(os.path.abspath(__file__))))
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+
+    try:
+        from rca.rag_retriever import RAGRetriever
+        rag   = RAGRetriever()
+        stats = rag.get_stats()
+
+        return {
+            "message":           "RAG Knowledge Base Statistics",
+            "seed_incidents":    stats["seed_incidents"],
+            "learned_incidents": stats["learned_incidents"],
+            "total_incidents":   stats["total"],
+            "knowledge_base_path": "data/incident_knowledge_base.json",
+            "description": (
+                "The system automatically learns from every new incident. "
+                f"Started with {stats['seed_incidents']} seed incidents, "
+                f"has learned {stats['learned_incidents']} more from live operation."
+            )
+        }
+    except Exception as e:
+        return {
+            "message": "Knowledge base not yet initialized",
+            "error":   str(e),
+            "tip":     "Run the full pipeline to generate incidents first"
+        }
 
 
 @router.get("/{incident_id}", summary="Get incident by ID")
@@ -140,7 +166,6 @@ async def get_incident(incident_id: str):
     """
     incidents = load_all_incidents()
 
-    # Find matching incident
     match = next(
         (i for i in incidents
          if i.get("incident_id") == incident_id),
@@ -153,7 +178,6 @@ async def get_incident(incident_id: str):
             detail=f"Incident {incident_id} not found"
         )
 
-    # Also load the text report
     report_text = load_report_text(incident_id)
 
     return {
