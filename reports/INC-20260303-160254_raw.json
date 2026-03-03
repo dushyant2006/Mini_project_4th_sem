@@ -1,0 +1,55 @@
+{
+  "incident_id": "INC-20260303-160254",
+  "timestamp": "2026-03-03T10:32:54.406396+00:00",
+  "severity": 1,
+  "root_cause_service": "api-gateway",
+  "root_cause_summary": "api-gateway experiencing cpu usage anomaly. Most likely cause: [Based on INC-001] Database connection pool exhausted due to slow queries during peak traffic",
+  "owning_team": "platform",
+  "hypotheses": [
+    "[Based on INC-001] Database connection pool exhausted due to slow queries during peak traffic",
+    "[Based on INC-005] Traffic spike from marketing campaign overwhelmed API gateway",
+    "Upstream service returning errors (cascade failure)"
+  ],
+  "recommended_fixes": [
+    "Check and increase database connection pool size",
+    "Identify and kill runaway processes",
+    "Scale service horizontally (add more replicas)"
+  ],
+  "blast_radius": {
+    "failed_service": "api-gateway",
+    "directly_affected": [],
+    "indirectly_affected": [
+      "notification-service",
+      "order-service",
+      "auth-service",
+      "inventory-service",
+      "payment-service",
+      "user-service"
+    ],
+    "total_affected": 6,
+    "criticality_score": 21,
+    "service_tier": "frontend",
+    "owning_team": "platform"
+  },
+  "anomaly_count": 56,
+  "affected_services": [
+    "api-gateway",
+    "auth-service",
+    "payment-service",
+    "notification-service",
+    "inventory-service",
+    "order-service",
+    "user-service"
+  ],
+  "similar_incidents": [
+    "INC-005",
+    "INC-001"
+  ],
+  "primary_anomaly": {
+    "type": "cpu_usage_anomaly",
+    "observed_value": 95.3,
+    "expected_value": 74.57,
+    "severity": 4
+  },
+  "status": "root_cause_identified"
+}

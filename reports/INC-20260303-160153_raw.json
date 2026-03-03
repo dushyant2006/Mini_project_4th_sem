@@ -1,0 +1,52 @@
+{
+  "incident_id": "INC-20260303-160153",
+  "timestamp": "2026-03-03T10:31:53.134246+00:00",
+  "severity": 1,
+  "root_cause_service": "order-service",
+  "root_cause_summary": "order-service experiencing cpu usage anomaly. Most likely cause: [Based on INC-004] Upstream payment-service returning 503 \u2014 cascade failure from payment outage",
+  "owning_team": "orders",
+  "hypotheses": [
+    "[Based on INC-004] Upstream payment-service returning 503 \u2014 cascade failure from payment outage",
+    "[Based on INC-001] Database connection pool exhausted due to slow queries during peak traffic",
+    "Upstream service returning errors (cascade failure)"
+  ],
+  "recommended_fixes": [
+    "Check and increase database connection pool size",
+    "Identify and kill runaway processes",
+    "Scale service horizontally (add more replicas)"
+  ],
+  "blast_radius": {
+    "failed_service": "order-service",
+    "directly_affected": [
+      "api-gateway"
+    ],
+    "indirectly_affected": [
+      "notification-service",
+      "inventory-service",
+      "payment-service"
+    ],
+    "total_affected": 3,
+    "criticality_score": 12,
+    "service_tier": "backend",
+    "owning_team": "orders"
+  },
+  "anomaly_count": 36,
+  "affected_services": [
+    "auth-service",
+    "payment-service",
+    "order-service",
+    "notification-service",
+    "user-service"
+  ],
+  "similar_incidents": [
+    "INC-001",
+    "INC-004"
+  ],
+  "primary_anomaly": {
+    "type": "cpu_usage_anomaly",
+    "observed_value": 92.17,
+    "expected_value": 74.31,
+    "severity": 4
+  },
+  "status": "root_cause_identified"
+}

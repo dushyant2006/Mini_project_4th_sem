@@ -1,0 +1,35 @@
+Incident ID : INC-20260303-160123
+Generated   : 20260303_160124
+Service     : api_gateway
+=================================================================
+
+### INCIDENT SUMMARY
+Incident ID: INC-20260303-160123, Severity: SEV-1. The api-gateway service experienced a CPU usage anomaly, peaking at 89.63%, significantly above the expected value of 74.69%.
+
+### BUSINESS IMPACT
+The anomaly indirectly affected 6 services: notification-service, order-service, auth-service, inventory-service, payment-service, and user-service, potentially impacting user experience and business operations.
+
+### TIMELINE
+- 2026-03-03T10:31:23.088657+00:00: Incident detected.
+- Ongoing: Investigation and mitigation efforts.
+
+### ROOT CAUSE
+The root cause is believed to be the database connection pool exhaustion due to slow queries during peak traffic, similar to incidents INC-001 and INC-005.
+
+### AFFECTED SERVICES
+6 services were indirectly affected: notification-service, order-service, auth-service, inventory-service, payment-service, and user-service.
+
+### IMMEDIATE ACTIONS
+1. **Check and adjust database connection pool size**: Increase the pool size to prevent exhaustion.
+2. **Identify and terminate runaway processes**: Kill any processes consuming excessive resources.
+3. **Scale api-gateway service horizontally**: Add more replicas to distribute the load.
+
+### LONG-TERM RECOMMENDATIONS
+- Optimize database queries to reduce execution time.
+- Implement auto-scaling for the api-gateway service based on traffic demand.
+- Regularly review and adjust database connection pool sizes.
+
+### LESSONS LEARNED
+- Regular monitoring of database query performance and connection pool utilization is crucial.
+- Proactive scaling and optimization of services can prevent similar incidents.
+- Review of past incidents (INC-001, INC-005) highlights the need for ongoing service optimization and capacity planning.
