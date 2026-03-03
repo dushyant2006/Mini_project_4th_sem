@@ -140,3 +140,88 @@ Cloud Systems → Telemetry → ML Detection → AI Agent → GenAI Report → D
 | **Storage** | PostgreSQL, Redis | Data persistence |
 | **Infra** | Docker Compose | Local infrastructure |
 | **Language** | Python 3.11 | Core implementation |
+
+
+## ⚙️ Setup & Installation
+
+### Prerequisites
+- Python 3.11+
+- Docker Desktop
+- Git
+
+### Step 1 — Clone Repository
+```bash
+git clone https://github.com/YOURUSERNAME/project71.git
+cd project71
+```
+
+### Step 2 — Create Virtual Environment
+```bash
+python -m venv venv
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # Mac/Linux
+```
+
+### Step 3 — Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4 — Configure Environment
+```bash
+cp .env.example .env
+# Edit .env and add your GROQ_API_KEY
+```
+
+### Step 5 — Start Infrastructure
+```bash
+docker-compose up -d
+# Wait 45 seconds for Kafka to initialize
+```
+
+### Step 6 — Verify Kafka is Ready
+```bash
+docker logs kafka | findstr "started"    # Windows
+docker logs kafka | grep "started"       # Mac/Linux
+```
+
+### Step 7 — Run All Components
+Open 4 separate terminals:
+
+**Terminal 1 — Telemetry Simulator:**
+```bash
+python data/simulate_telemetry.py
+```
+
+**Terminal 2 — ML Detection Engine:**
+```bash
+python detection/detection_engine.py
+```
+
+**Terminal 3 — RCA Engine:**
+```bash
+python rca/rca_engine.py
+```
+
+**Terminal 4 — Report Engine:**
+```bash
+python reporting/report_engine.py
+```
+
+**Terminal 5 — FastAPI Server:**
+```bash
+uvicorn api.main:app --reload --port 8000
+```
+
+### Step 8 — Test Anomaly Detection
+```bash
+# In a new terminal — inject payment-service failure
+python data/simulate_telemetry.py --anomaly payment-service
+
+
+### Step 9 — View Results
+| Interface | URL |
+|---|---|
+| **Swagger API Docs** | http://localhost:8000/docs |
+| **Kafka UI** | http://localhost:8080 |
+| **Incident Reports** | `/reports/` folder |
