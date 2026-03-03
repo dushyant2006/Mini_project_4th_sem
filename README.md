@@ -293,3 +293,39 @@ project71/
 ├── docker-compose.yml  # Infrastructure setup
 ├── requirements.txt    # Python dependencies
 └── .env                # Configuration (not committed)
+
+
+
+## 🔑 Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+| Variable | Description | Required |
+|---|---|---|
+| `KAFKA_BOOTSTRAP_SERVERS` | Kafka broker address | Yes |
+| `GROQ_API_KEY` | Free API key from console.groq.com | Yes |
+| `POSTGRES_*` | PostgreSQL connection details | Yes |
+| `REDIS_HOST` | Redis host | Yes |
+
+---
+
+## 👥 Author
+
+**Your Name**
+- Domain: Cloud Computing, AIOps, ML Systems
+- Project: Autonomous Incident Response Platform
+
+---
+
+## 📄 License
+
+MIT License — Free to use for educational purposes.
+
+---
+
+## 🙏 Acknowledgements
+
+- Apache Kafka for real-time streaming
+- Groq for free Llama 3 API access
+- FastAPI for the REST framework
+- scikit-learn + PyTorch for ML models
