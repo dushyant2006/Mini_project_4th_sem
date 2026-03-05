@@ -28,3 +28,6 @@ detection/models/*.pt
 # OS files
 .DS_Store
 Thumbs.db
+
+reports/
+data/incident_knowledge_base.json
