@@ -151,7 +151,7 @@ Cloud Systems → Telemetry → ML Detection → AI Agent → GenAI Report → D
 
 ### Step 1 — Clone Repository
 ```bash
-git clone https://github.com/YOURUSERNAME/project71.git
+git clone https://github.com/dushyant2006/Mini_project_4th_sem.git
 cd project71
 ```
 
