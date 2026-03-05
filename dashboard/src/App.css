@@ -1,38 +1,238 @@
-.App {
-  text-align: center;
+/* ── Reset & Base ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app {
+  display: flex;
   min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  background: #1a1d2e;
+  border-right: 1px solid #2d3748;
   display: flex;
   flex-direction: column;
+  padding: 20px 0;
+  position: fixed;
+  height: 100vh;
+}
+
+.sidebar-header {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 10px;
+  padding: 0 20px 24px;
+  border-bottom: 1px solid #2d3748;
 }
 
-.App-link {
-  color: #61dafb;
+.logo { font-size: 28px; }
+.logo-title { font-weight: 700; font-size: 15px; color: #fff; }
+.logo-sub   { font-size: 11px; color: #718096; }
+
+.nav-links {
+  list-style: none;
+  padding: 16px 0;
+  flex: 1;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.nav-links li a {
+  display: block;
+  padding: 10px 20px;
+  color: #a0aec0;
+  text-decoration: none;
+  font-size: 14px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
 }
+
+.nav-links li a:hover { background: #2d3748; color: #fff; }
+.nav-links li a.active {
+  background: #2d3748;
+  color: #63b3ed;
+  border-left-color: #63b3ed;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #2d3748;
+}
+
+.sidebar-footer a {
+  color: #718096;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+/* ── Main Content ── */
+.main-content {
+  margin-left: 220px;
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.page-header p {
+  color: #718096;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ── Stats Cards ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #1a1d2e;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card .stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 6px 0;
+}
+
+.stat-card .stat-sub {
+  font-size: 12px;
+  color: #48bb78;
+}
+
+/* ── Table ── */
+.table-card {
+  background: #1a1d2e;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.table-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #2d3748;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #718096;
+  background: #161824;
+}
+
+td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-top: 1px solid #2d3748;
+  color: #cbd5e0;
+}
+
+tr:hover td { background: #1e2132; }
+
+/* ── Severity Badges ── */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-1 { background: #742a2a; color: #fc8181; }
+.badge-2 { background: #744210; color: #f6ad55; }
+.badge-3 { background: #744210; color: #fbd38d; }
+.badge-4 { background: #1a365d; color: #63b3ed; }
+
+/* ── Loading / Empty states ── */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #718096;
+  font-size: 14px;
+}
+
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+  font-size: 14px;
+}
+
+/* ── Service graph ── */
+.graph-container {
+  background: #1a1d2e;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.service-node {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.node-critical { background: #742a2a; color: #fc8181; }
+.node-high     { background: #744210; color: #f6ad55; }
+.node-medium   { background: #1a365d; color: #63b3ed; }
+.node-low      { background: #1c3a2e; color: #68d391; }
+
+/* ── Refresh button ── */
+.refresh-btn {
+  background: #2d3748;
+  color: #a0aec0;
+  border: 1px solid #4a5568;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  float: right;
+  margin-top: -4px;
+}
+
+.refresh-btn:hover { background: #4a5568; color: #fff; }
