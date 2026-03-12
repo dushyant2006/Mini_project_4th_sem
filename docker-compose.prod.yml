@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY:-local}/backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - DATABASE_URL=postgresql://admin:admin123@postgres:5432/incidents
+      - REDIS_URL=redis://redis:6379
+    restart: unless-stopped
+
+  dashboard:
+    image: ghcr.io/${GITHUB_REPOSITORY:-local}/dashboard:latest
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: dashboard
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
