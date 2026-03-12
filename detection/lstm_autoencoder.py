@@ -1,12 +1,3 @@
-# ============================================================
-# detection/lstm_autoencoder.py
-# PURPOSE: Detects time-series anomalies using LSTM Autoencoder
-#
-# How it works:
-#   TRAINING: Feed normal sequences → model learns to reconstruct them
-#   DETECTION: Feed new sequence → if reconstruction error is HIGH
-#              → the pattern is abnormal → ANOMALY!
-# ============================================================
 
 import numpy as np
 import torch
@@ -23,7 +14,7 @@ from ingestion.models import AnomalyEvent
 from detection.data_buffer import MetricBuffer
 
 
-# ── LSTM Autoencoder Architecture ────────────────────────────
+# LSTM Autoencoder Architecture 
 
 class LSTMEncoder(nn.Module):
     """
