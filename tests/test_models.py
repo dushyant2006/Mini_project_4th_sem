@@ -22,7 +22,7 @@ class TestMetricEvent:
         assert event.value == 85.5
 
     def test_metric_event_dict(self):
-        """Test MetricEvent converts to dict"""
+        """Test MetricEvent converts to dict via model_dump"""
         event = MetricEvent(
             timestamp=datetime.now(timezone.utc),
             service="api-gateway",
@@ -30,7 +30,7 @@ class TestMetricEvent:
             value=120.0,
             unit="ms"
         )
-        d = event.to_dict()
+        d = event.model_dump()
         assert d["service"] == "api-gateway"
         assert d["metric_name"] == "request_latency_ms"
         assert "timestamp" in d
