@@ -1,7 +1,3 @@
-# ============================================================
-# tests/test_rca.py
-# PURPOSE: Unit tests for RCA agent and graph builder
-# ============================================================
 
 import pytest
 import sys, os

@@ -1,3 +1,9 @@
+# ============================================================
+# .github/workflows/cd.yml
+# PURPOSE: Continuous Deployment Pipeline
+# Builds Docker images and pushes to GitHub Container Registry
+# ============================================================
+
 name: CD Pipeline — Docker Build & Push
 
 on:
@@ -15,9 +21,8 @@ permissions:
   packages: write
 
 jobs:
-  # ──────────────────────────────────────────────
-  # Build & Push Backend Docker Image
-  # ──────────────────────────────────────────────
+
+  # ── Build & Push Backend ──────────────────────────────────
   build-backend:
     name: Build Backend Image
     runs-on: ubuntu-latest
@@ -51,9 +56,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ──────────────────────────────────────────────
-  # Build & Push Dashboard Docker Image
-  # ──────────────────────────────────────────────
+  # ── Build & Push Dashboard ────────────────────────────────
   build-dashboard:
     name: Build Dashboard Image
     runs-on: ubuntu-latest
@@ -87,9 +90,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ──────────────────────────────────────────────
-  # Deploy (Docker Compose on self-hosted runner)
-  # ──────────────────────────────────────────────
+  # ── Deploy ────────────────────────────────────────────────
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
