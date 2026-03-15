@@ -3,5 +3,3 @@ build
 .git
 .github
 *.md
-.dockerignore
-Dockerfile
