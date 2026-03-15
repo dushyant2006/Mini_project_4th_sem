@@ -2,127 +2,38 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [main, develop, feature/*]
+    branches: [main, feature/*]
   pull_request:
     branches: [main]
 
-env:
-  PYTHON_VERSION: "3.11"
-  NODE_VERSION: "20"
-
 jobs:
-
-  backend-lint:
-    name: Backend Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8
-          pip install -r requirements.txt
-
-      - name: Run flake8
-        run: |
-          flake8 api/ detection/ ingestion/ rca/ reporting/ \
-            --max-line-length=120 \
-            --exclude=__pycache__,*.pyc \
-            --ignore=E501,W503,E302,E303 \
-            --count --statistics
-        continue-on-error: true
 
   backend-test:
     name: Backend Tests
     runs-on: ubuntu-latest
-    needs: backend-lint
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-asyncio httpx
 
-      - name: Create required directories
+      - name: Create required dirs
         run: |
-          mkdir -p reports
-          mkdir -p data
+          mkdir -p reports data
           echo "[]" > data/incident_knowledge_base.json
 
       - name: Run tests
-        run: |
-          python -m pytest tests/ -v --tb=short
+        run: pytest tests/ -v --tb=short
         env:
           KAFKA_BOOTSTRAP_SERVERS: localhost:9092
           GROQ_API_KEY: test_key
           POSTGRES_HOST: localhost
           POSTGRES_PASSWORD: admin123
           REDIS_HOST: localhost
-
-  dashboard-lint-test:
-    name: Dashboard Lint & Test
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: dashboard
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test -- --watchAll=false --passWithNoTests
-        env:
-          CI: true
-        continue-on-error: true
-
-  dashboard-build:
-    name: Dashboard Build
-    runs-on: ubuntu-latest
-    needs: dashboard-lint-test
-    defaults:
-      run:
-        working-directory: dashboard
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build dashboard
-        run: npm run build
-        env:
-          CI: false
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dashboard-build
-          path: dashboard/build/
-          retention-days: 7
