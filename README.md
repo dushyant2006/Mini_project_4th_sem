@@ -115,49 +115,49 @@ All 3 models run simultaneously — any detection triggers the RCA agent.
 ## 🏗️ System Architecture
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    SIMULATED MICROSERVICES                       │
+│                    SIMULATED MICROSERVICES                      │
 │  api-gateway → auth-service     → user-service                  │
 │  api-gateway → order-service    → payment-service ← ROOT CAUSE  │
-│                                 → inventory-service              │
-│               payment-service   → notification-service           │
+│                                 → inventory-service             │
+│               payment-service   → notification-service          │
 └────────────────────────────┬────────────────────────────────────┘
                              │ 4 streams: logs + metrics + traces
                              │ every 5 seconds
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│              TELEMETRY INGESTION LAYER (Apache Kafka)            │
-│   Topics: telemetry.logs | telemetry.metrics | telemetry.traces  │
+│              TELEMETRY INGESTION LAYER (Apache Kafka)           │
+│   Topics: telemetry.logs | telemetry.metrics | telemetry.traces │
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│               ML ANOMALY DETECTION ENGINE                        │
-│                                                                  │
+│               ML ANOMALY DETECTION ENGINE                       │
+│                                                                 │
 │   ┌──────────────────┐ ┌──────────────────┐ ┌────────────────┐  │
-│   │ Isolation Forest │ │ LSTM Autoencoder  │ │    Prophet     │  │
-│   │ (spike detect)   │ │ (pattern detect)  │ │ (seasonality)  │  │
+│   │ Isolation Forest │ │ LSTM Autoencoder │ │    Prophet     │  │
+│   │ (spike detect)   │ │ (pattern detect) │ │ (seasonality)  │  │
 │   └──────────────────┘ └──────────────────┘ └────────────────┘  │
-│                         anomalies.detected                       │
+│                         anomalies.detected                      │
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    RCA AGENT                                     │
-│   Step 1: Group anomalies by service                             │
-│   Step 2: Graph analysis → find root cause                       │
-│   Step 3: Calculate blast radius                                 │
+│                    RCA AGENT                                    │
+│   Step 1: Group anomalies by service                            │
+│   Step 2: Graph analysis → find root cause                      │
+│   Step 3: Calculate blast radius                                │
 │   Step 4: RAG search over incident knowledge base               │
 │   Step 5: Generate hypotheses + recommended fixes               │
-│                         rca.results                              │
+│                         rca.results                             │
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│           GENAI REPORT GENERATOR (Groq Llama 3)                  │
-│   Output: /reports/*.txt + /reports/*_raw.json                   │
-│   Learns: auto-saved to incident knowledge base                  │
+│           GENAI REPORT GENERATOR (Groq Llama 3)                 │
+│   Output: /reports/*.txt + /reports/*_raw.json                  │
+│   Learns: auto-saved to incident knowledge base                 │
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│        FASTAPI REST API          REACT DASHBOARD                 │
-│   http://localhost:8000/docs     http://localhost:3000           │
+│        FASTAPI REST API          REACT DASHBOARD                │
+│   http://localhost:8000/docs     http://localhost:3000          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
