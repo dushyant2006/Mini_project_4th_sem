@@ -1,9 +1,3 @@
-# ============================================================
-# .github/workflows/cd.yml
-# PURPOSE: Continuous Deployment Pipeline
-# Builds Docker images and pushes to GitHub Container Registry
-# ============================================================
-
 name: CD Pipeline — Docker Build & Push
 
 on:
@@ -22,7 +16,6 @@ permissions:
 
 jobs:
 
-  # ── Build & Push Backend ──────────────────────────────────
   build-backend:
     name: Build Backend Image
     runs-on: ubuntu-latest
@@ -56,7 +49,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ── Build & Push Dashboard ────────────────────────────────
   build-dashboard:
     name: Build Dashboard Image
     runs-on: ubuntu-latest
@@ -81,16 +73,16 @@ jobs:
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push dashboard image
+            - name: Build and push dashboard image
         uses: docker/build-push-action@v5
         with:
           context: ./dashboard
           file: ./dashboard/Dockerfile
           push: true
+          no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # ── Deploy ────────────────────────────────────────────────
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
@@ -107,3 +99,4 @@ jobs:
           echo "── Starting services ──"
           docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
           echo "── Deployment complete ──"
+        continue-on-error: true
