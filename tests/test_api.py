@@ -1,4 +1,3 @@
-
 import pytest
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -53,8 +52,8 @@ class TestIncidentEndpoints:
         response = client.get("/incidents/knowledge-base")
         assert response.status_code == 200
 
-   def test_invalid_incident_returns_404(self):
-        """Test invalid incident ID format returns 400"""
+    def test_invalid_incident_returns_404(self):
+        """Test invalid incident ID format returns 400 or 404"""
         response = client.get("/incidents/FAKE-ID-999")
         assert response.status_code in [400, 404]
 
