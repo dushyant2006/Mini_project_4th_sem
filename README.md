@@ -1,4 +1,4 @@
-# ⚡ Project 71 — Autonomous Incident Response & Root-Cause Intelligence Platform
+# ⚡ Autonomous Incident Response & Root-Cause Intelligence Platform
 
 ![CI](https://github.com/dushyant2006/Mini_project_4th_sem/actions/workflows/ci.yml/badge.svg)
 ![CD](https://github.com/dushyant2006/Mini_project_4th_sem/actions/workflows/cd.yml/badge.svg)
